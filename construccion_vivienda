@@ -1,0 +1,195 @@
+CREATE DATABASE construccion_vivienda;
+go
+use construccion_vivienda
+
+create table agencias(
+id int primary key identity (1,1),
+nombre varchar (100) not null,
+ubicación varchar (255) not null,
+telefono varchar(20)
+);
+go
+
+select * from vivienda
+
+
+create table clientes(
+cod_cliente int primary key identity (1,1),
+documento_identidad varchar (20) unique not null,
+nombres varchar (255) not null,
+apellido_paterno varchar (255) not null,
+apellido_materno varchar (255) not null,
+email varchar (100) not null,
+celular varchar (20) not null,
+direccion varchar (255) not null,
+);
+
+create table linea_financiamiento(
+id int primary key identity (1,1),
+nombre_linea varchar (150) not null,
+tasa_interes float not null,
+);
+
+
+create table catalogo_vivienda(
+id_modelo int primary key identity (1,1),
+nombre_modelo varchar (150) not null,
+descripcion varchar (250),
+precio_base money not null
+);
+
+create table financiamiento_construccion(
+id int primary key identity (1,1),
+monto money not null,
+fecha_inicio date not null,
+fecha_vencimiento date not null,
+estado varchar (100),
+created_at datetime not null,
+updated_at datetime  null,
+deleted_at datetime  null,
+created_by  int not null,
+updated_by int  null,
+deleted_by int  null,
+id_cliente int not null,
+id_agencia int not null,
+id_linea int not null,
+CONSTRAINT fk_id_cliente FOREIGN KEY (id_cliente) REFERENCES clientes(cod_cliente),
+CONSTRAINT fk_id_agencia Foreign key (id_agencia) references agencias(id),
+constraint fk_id_linea_financiamiento foreign key (id_linea) references linea_financiamiento(id));
+
+
+
+create table vivienda(
+id int primary key identity (1,1),
+departamento varchar (100),
+distrito varchar (100),
+ubicacion varchar (350),
+metros_cuadrados int not null,
+estado_vivienda varchar (150),
+id_modelo_vivienda int not null,
+id_financiamiento int not null,
+constraint fk_id_financiamiento foreign key (id_financiamiento) references financiamiento_construccion(id),
+constraint fk_id_modelo_vivienda foreign key (id_modelo_vivienda) references catalogo_vivienda(id_modelo));
+
+
+create table detalle_materiales(
+id int primary key identity (1,1),
+cantidad int not null,
+costo_unitario money not null,
+subtotal money not null,
+id_vivienda int not null,
+constraint fk_id_vivienda foreign key (id_vivienda) references vivienda(id));
+
+
+
+create table materiales(
+id int primary key identity (1,1),
+nombre_material varchar (150) not null,
+descripcion varchar (350),
+costo_unitario money not null,
+id_detalle_material int not null,
+constraint fk_id_detalle_material foreign key (id_detalle_material) references detalle_materiales(id));
+
+
+-- Tabla: agencias
+INSERT INTO agencias (nombre, ubicación, telefono) VALUES
+('Agencia San Salvador', 'San Salvador, Centro Histórico', '2222-2222'),
+('Agencia San Miguel', 'San Miguel, Ciudad Jardín', '2233-2233'),
+('Agencia Santa Ana', 'Santa Ana, Metrocentro', '2244-2244'),
+('Agencia La Libertad', 'Santa Tecla, Centro', '2255-2255'),
+('Agencia Chalatenango', 'Chalatenango, Central', '2266-2266'),
+('Agencia Usulután', 'Usulután, Centro', '2277-2277'),
+('Agencia Sonsonate', 'Sonsonate, Plaza del Sol', '2288-2288'),
+('Agencia Ahuachapán', 'Ahuachapán, Centro', '2299-2299'),
+('Agencia Morazán', 'San Francisco Gotera, Plaza Morazán', '2300-2300'),
+('Agencia Cabañas', 'Sensuntepeque, Central', '2311-2311');
+
+-- Tabla: clientes
+INSERT INTO clientes (documento_identidad, nombres, apellido_paterno, apellido_materno, email, celular, direccion) VALUES
+('0012345678', 'Juan', 'Perez', 'Gomez', 'juan.perez@example.com', '7011-1234', 'San Salvador, Centro'),
+('0012345679', 'Maria', 'Lopez', 'Martinez', 'maria.lopez@example.com', '7012-1235', 'Santa Ana, Centro'),
+('0012345680', 'Carlos', 'Hernandez', 'Ruiz', 'carlos.hernandez@example.com', '7013-1236', 'San Miguel, Centro'),
+('0012345681', 'Ana', 'Cruz', 'Vargas', 'ana.cruz@example.com', '7014-1237', 'Sonsonate, Colonia Miramonte'),
+('0012345682', 'Luis', 'Ramirez', 'Torres', 'luis.ramirez@example.com', '7015-1238', 'Usulután, Centro'),
+('0012345683', 'Sofia', 'Morales', 'Diaz', 'sofia.morales@example.com', '7016-1239', 'Chalatenango, Centro'),
+('0012345684', 'Pedro', 'Alvarado', 'Castro', 'pedro.alvarado@example.com', '7017-1240', 'Ahuachapán, Colonia Centro'),
+('0012345685', 'Laura', 'Flores', 'Lopez', 'laura.flores@example.com', '7018-1241', 'La Libertad, Centro'),
+('0012345686', 'Andres', 'Gonzalez', 'Mendoza', 'andres.gonzalez@example.com', '7019-1242', 'Cabañas, Plaza Central'),
+('0012345687', 'Diana', 'Martinez', 'Rojas', 'diana.martinez@example.com', '7020-1243', 'Morazán, Centro');
+
+-- Tabla: linea_financiamiento
+INSERT INTO linea_financiamiento (nombre_linea, tasa_interes) VALUES
+('Construcción en terreno propio', 7.0),
+('Construcción en terreno comprado', 8.0),
+('Línea Construcción Residencial', 8.0),
+('Línea EcoVivienda', 6.0),
+('Línea Social Solidaria', 5.5);
+
+-- Tabla: catalogo_vivienda
+INSERT INTO catalogo_vivienda (nombre_modelo, descripcion, precio_base) VALUES
+('Modelo Popular', 'Vivienda básica con dos habitaciones', 12000.00),
+('Modelo Familiar', 'Casa con tres habitaciones y sala', 18000.00),
+('Modelo Urbano', 'Vivienda moderna en zona urbana', 25000.00),
+('Modelo Rústico', 'Casa rústica en zona rural', 15000.00),
+('Modelo Compacto', 'Pequeña vivienda funcional', 10000.00),
+('Modelo Premium', 'Vivienda de lujo con acabados modernos', 30000.00),
+('Modelo Ecológico', 'Vivienda sustentable con energía solar', 22000.00),
+('Modelo Económico', 'Vivienda de bajo costo', 8000.00),
+('Modelo Multifamiliar', 'Casa para varias familias', 28000.00);
+
+select * from financiamiento_construccion
+select * from catalogo_vivienda
+select * from vivienda
+select * from detalle_materiales
+select * from materiales
+
+-- Tabla: financiamiento_construccion
+INSERT INTO financiamiento_construccion (monto, fecha_inicio, fecha_vencimiento, estado, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by, id_cliente, id_agencia, id_linea) VALUES
+(15000.00, '2024-01-01', '2026-01-01', 'Activo', '2024-01-01 10:00:00', NULL, NULL, 1, NULL, NULL, 1, 1, 1),
+(25000.00, '2024-02-15', '2027-02-15', 'Activo', '2024-02-15 11:00:00', NULL, NULL, 2, NULL, NULL, 2, 2, 2),
+(30000.00, '2024-03-10', '2028-03-10', 'Activo', '2024-03-10 12:00:00', NULL, NULL, 3, NULL, NULL, 3, 3, 3),
+(20000.00, '2024-04-20', '2026-04-20', 'Activo', '2024-04-20 09:30:00', NULL, NULL, 4, NULL, NULL, 4, 4, 4),
+(18000.00, '2024-05-05', '2027-05-05', 'Activo', '2024-05-05 14:00:00', NULL, NULL, 5, NULL, NULL, 5, 5, 5),
+(12000.00, '2024-06-01', '2026-06-01', 'Activo', '2024-06-01 08:15:00', NULL, NULL, 6, NULL, NULL, 6, 6, 2),
+(25000.00, '2024-07-12', '2027-07-12', 'Activo', '2024-07-12 10:45:00', NULL, NULL, 7, NULL, NULL, 7, 7, 1),
+(22000.00, '2024-08-18', '2027-08-18', 'Activo', '2024-08-18 13:20:00', NULL, NULL, 8, NULL, NULL, 8, 8, 1),
+(28000.00, '2024-09-25', '2028-09-25', 'Activo', '2024-09-25 11:10:00', NULL, NULL, 9, NULL, NULL, 9, 9, 5),
+(10000.00, '2024-10-30', '2025-10-30', 'Activo', '2024-10-30 15:50:00', NULL, NULL, 10, NULL, NULL, 10,10, 1);
+
+
+INSERT INTO vivienda (departamento, distrito, ubicacion, metros_cuadrados, estado_vivienda, id_modelo_vivienda, id_financiamiento) VALUES
+('San Salvador', 'Centro', 'Colonia Escalón', 120, 'En construcción', 1, 19),
+('Santa Ana', 'Metrocentro', 'Colonia Santa Anita', 100, 'Terminado', 2, 20),
+('San Miguel', 'Ciudad Jardín', 'Colonia Jardines del Volcán', 140, 'En construcción', 3, 21),
+('Sonsonate', 'Miramonte', 'Colonia San Antonio', 90, 'Terminado', 3, 22),
+('Usulután', 'Centro', 'Colonia Vista al Mar', 110, 'En construcción', 5, 23),
+('Chalatenango', 'Centro', 'Colonia El Encanto', 80, 'Terminado', 6, 24),
+('Ahuachapán', 'Centro', 'Colonia Las Palmas', 130, 'En construcción', 7, 25),
+('Cabañas', 'Plaza Central', 'Colonia Los Olivos', 150, 'Terminado', 8, 26),
+('Morazán', 'Centro', 'Colonia El Progreso', 125, 'En construcción', 9, 27),
+('La Libertad', 'Santa Tecla', 'Colonia San Francisco', 95, 'Terminado', 8, 28);
+
+INSERT INTO detalle_materiales (cantidad, costo_unitario, subtotal, id_vivienda) VALUES
+(100, 15.00, 1500.00, 1),
+(200, 12.50, 2500.00, 2),
+(150, 20.00, 3000.00, 3),
+(250, 18.00, 4500.00, 4),
+(300, 10.00, 3000.00, 5),
+(180, 25.00, 4500.00, 6),
+(220, 17.50, 3850.00, 7),
+(120, 22.00, 2640.00, 8),
+(280, 11.00, 3080.00, 9),
+(130, 30.00, 3900.00, 10);
+
+-- Tabla: materiales
+INSERT INTO materiales (nombre_material, descripcion, costo_unitario, id_detalle_material) VALUES
+('Cemento', 'Saco de cemento gris', 7.50, 1),
+('Ladrillos', 'Ladrillos rojos para construcción', 0.50, 2),
+('Hierro', 'Barras de hierro para refuerzo', 1.20, 3),
+('Arena', 'Metro cúbico de arena', 12.00, 4),
+('Grava', 'Metro cúbico de grava', 15.00, 5),
+('Bloques', 'Bloques de concreto', 0.80, 6),
+('Tejas', 'Tejas de barro', 2.00, 7),
+('Madera', 'Madera tratada para construcción', 4.50, 8),
+('Vidrio', 'Paneles de vidrio', 20.00, 9),
+('Pintura', 'Galón de pintura', 25.00, 10);
